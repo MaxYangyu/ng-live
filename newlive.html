@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>逗播直播</title>
+    <link rel="stylesheet" href="http://static.cdn.doubo.tv/20170615/css/doubo_style.css?v=5">
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/rem.js"></script>
+    <script src="https://unpkg.com/vue"></script>
+    <link rel="stylesheet" href="css/mui.min.css">
+    <script src="js/mui.js"></script>
+    <script src="vue-resource.min.js"></script>
+    <style>
+        .level_number {
+            padding-top: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="refreshContainer" class="mui-content mui-scroll-wrapper">
+    <div class="mui-scroll">
+        <div class="main" id="app">
+            <div class="live_con_sign" v-for="item in list" v-bind:onclick="'enterlive('+item.live_id+')'">
+                <div class="live_neight_perent">
+                    <div class="profile_con">
+                        <div class="profile_left"><img v-bind:src="item.headimg" class="avatar_img radiu50"></div>
+                        <div class="profile_middle">
+                            <div class="pro_top_name_con"><p class="pro_name">{{item.username}}</p>
+                                <div class="pro_level_con"><p><img
+                                        v-bind:src="'http://static.cdn.doubo.tv/20170615/img/ngmob_level_'+(parseInt(item.rank/10)+1)+ '.png'"
+                                        class="live_level_img"></p>
+                                    <p class="level_number">{{item.rank}}</p></div>
+                            </div>
+                            <div class="pro_top_name_con"><p><img
+                                    src="http://static.cdn.doubo.tv/20170615/img/coordinate_img.png"
+                                    class="coordinate_img"> <span class="city_name">{{item.location}}</span>
+                            </p></div>
+                        </div>
+                        <div class="profile_right">
+                            <div class="pro_top_name_con"><p class="audience">{{item.user_num}}人</p></div>
+                            <div class="pro_top_name_con"><p class="look_at">在看</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cover_pic_con" onclick="enterlive('{{item.live_id}}')"><img v-bind:src="item.cover"
+                                                                                        class="img"/>
+                    <div class="live_neight_perent_i">
+                        <div class="trades_text">{{item.title}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+<script>
+
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: [],
+        },
+        methods: {
+            getlist() {
+                this.$http.get('http://m.doubo.tv/onlive_livelist').then(function (res) {
+                    this.list = res.body.live_list
+                })
+                mui('#refreshContainer').pullRefresh().endPulldownToRefresh()
+            },
+
+
+        },
+
+
+    });
+    mui.init({
+        pullRefresh : {
+            container:"#refreshContainer",//下拉刷新容器标识，querySelector能定位的css选择器均可，比如：id、.class等
+            down : {
+                height:50,//可选,默认50.触发下拉刷新拖动距离,
+                auto: true,//可选,默认false.首次加载自动下拉刷新一次
+                contentdown : "下拉可以刷新",//可选，在下拉可刷新状态时，下拉刷新控件上显示的标题内容
+                contentover : "释放立即刷新",//可选，在释放可刷新状态时，下拉刷新控件上显示的标题内容
+                contentrefresh : "正在刷新...",//可选，正在刷新状态时，下拉刷新控件上显示的标题内容
+                callback :vm.getlist//必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+            }
+        },
+
+    });
+
+
+</script>
+</html>
